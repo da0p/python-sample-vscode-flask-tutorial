@@ -45,13 +45,28 @@ steps:
     script: |
       import sys
       print ('Executing script file is:', str(sys.argv[0]))
-      print ('The arguments are:', str(sys.args))
+      print ('The arguments are:', str(sys.argv))
       import argparse
       parser = argparse.ArgumentParser()
       parser.add_argument("--word", help="Provide the name of the world to greet.")
       args = parser.parse_args()
-      print ('Hello ', args.world)
+      print ('Hello ', args.word)
     arguments: --word Venus
+
+- script: |
+    pip install pytest pytest-azurepipelines
+    pytest
+  displayName: 'pytest'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '**/test-*.xml'
+    testRunTitle: 'Publish test results for Python $(python.version)'
+
+- task: PublishCodeCoverageResults@2
+  inputs:
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
 
 - task: ArchiveFiles@2
   displayName: 'Archive files'
@@ -68,7 +83,4 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
 
-- script: |
-    pip install pytest pytest-azurepipelines
-    pytest
-  displayName: 'pytest'
+
