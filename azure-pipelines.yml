@@ -39,6 +39,20 @@ steps:
       print('Hello world 1')
       print('Hello world 2')
 
+- task: PythonScript@0
+  inputs:
+    scriptSource: inline
+    script: |
+      import sys
+      print ('Executing script file is:', str(sys.argv[0]))
+      print ('The arguments are:', str(sys.args))
+      import argparse
+      parser = argparse.ArgumentParser()
+      parser.add_argument("--word", help="Provide the name of the world to greet.")
+      args = parser.parse_args()
+      print ('Hello ', args.world)
+    arguments: --word Venus
+
 - task: ArchiveFiles@2
   displayName: 'Archive files'
   inputs:
